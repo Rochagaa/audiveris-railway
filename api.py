@@ -9,6 +9,8 @@ BASE_DIR = "/data"
 INPUT_DIR = f"{BASE_DIR}/input"
 OUTPUT_DIR = f"{BASE_DIR}/output"
 
+AUDIVERIS_BIN = "/audiveris/app/build/install/app/bin/app"
+
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -24,13 +26,13 @@ async def run_omr(file: UploadFile = File(...)):
     with open(input_pdf, "wb") as f:
         f.write(await file.read())
 
-    cmd = [
-        "/audiveris/build/install/audiveris/bin/audiveris",
-        "-batch",
-        "-export",
-        "-output", output_dir,
-        input_pdf
-    ]
+cmd = [
+    AUDIVERIS_BIN,
+    "-batch",
+    "-export",
+    "-output", output_dir,
+    input_pdf
+]
 
     subprocess.run(cmd, check=True)
 
