@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 import subprocess
 import uuid
 import os
@@ -17,6 +17,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 @app.post("/omr")
 async def run_omr(file: UploadFile = File(...)):
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Envie um arquivo PDF")
+
     job_id = str(uuid.uuid4())
     input_pdf = f"{INPUT_DIR}/{job_id}.pdf"
     output_dir = f"{OUTPUT_DIR}/{job_id}"
@@ -26,24 +29,40 @@ async def run_omr(file: UploadFile = File(...)):
     with open(input_pdf, "wb") as f:
         f.write(await file.read())
 
-cmd = [
-    AUDIVERIS_BIN,
-    "-batch",
-    "-export",
-    "-output", output_dir,
-    input_pdf
-]
+    cmd = [
+        AUDIVERIS_BIN,
+        "-batch",
+        "-export",
+        "-output", output_dir,
+        input_pdf
+    ]
 
-    subprocess.run(cmd, check=True)
+    try:
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        return {
+            "error": "Audiveris failed",
+            "stdout": e.stdout,
+            "stderr": e.stderr
+        }
 
-    # procurar MusicXML gerado
     for root, _, files in os.walk(output_dir):
-        for file in files:
-            if file.endswith(".musicxml") or file.endswith(".xml"):
-                with open(os.path.join(root, file), "r", encoding="utf-8", errors="ignore") as f:
+        for filename in files:
+            if filename.endswith(".musicxml") or filename.endswith(".xml"):
+                with open(os.path.join(root, filename), "r", encoding="utf-8", errors="ignore") as f:
                     return {
                         "job_id": job_id,
                         "musicxml": f.read()
                     }
 
-    return {"error": "MusicXML not found"}
+    return {
+        "error": "MusicXML not generated",
+        "stdout": result.stdout,
+        "stderr": result.stderr
+    }
