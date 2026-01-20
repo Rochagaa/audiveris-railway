@@ -22,6 +22,10 @@ RUN git clone https://github.com/Audiveris/audiveris.git .
 
 RUN ./gradlew installDist --no-daemon
 
+# Criar link fixo para o Audiveris
+RUN find /audiveris -type f -perm /111 -name audiveris | head -n 1 > /tmp/audiveris_path && \
+    ln -s "$(cat /tmp/audiveris_path)" /usr/local/bin/audiveris
+
 # -----------------------------
 # 3. Criar ambiente virtual Python
 # -----------------------------
