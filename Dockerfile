@@ -12,11 +12,11 @@ RUN apt-get update && apt-get install -y \
 # Criar diretório do Audiveris
 WORKDIR /audiveris
 
-# Baixar Audiveris
-RUN apt-get update && apt-get install -y curl \
-    && curl -L https://github.com/Audiveris/audiveris/releases/latest/download/Audiveris-bin.zip -o audiveris.zip \
-    && unzip audiveris.zip \
-    && rm audiveris.zip
+# Baixar e extrair Audiveris (formato tar.gz)
+RUN apt-get update && apt-get install -y curl tar \
+    && curl -L https://github.com/Audiveris/audiveris/releases/latest/download/Audiveris.tar.gz -o audiveris.tar.gz \
+    && tar -xzf audiveris.tar.gz \
+    && rm audiveris.tar.gz
 
 # Copiar script de inicialização
 COPY start.sh /start.sh
