@@ -41,16 +41,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY api.py .
 
 # -----------------------------
-# 5. Diretório de dados
-# -----------------------------
-WORKDIR /data
 
 # -----------------------------
-# 6. Expor porta da API
+# 5. Expor porta da API
 # -----------------------------
 EXPOSE 8000
 
 # -----------------------------
-# 7. Subir a API automaticamente
+# 6. Subir a API automaticamente
 # -----------------------------
+WORKDIR /app
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+
