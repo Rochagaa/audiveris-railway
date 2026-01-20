@@ -9,7 +9,7 @@ BASE_DIR = "/data"
 INPUT_DIR = f"{BASE_DIR}/input"
 OUTPUT_DIR = f"{BASE_DIR}/output"
 
-AUDIVERIS_BIN = "/audiveris/app/build/install/app/bin/audiveris"
+AUDIVERIS_BIN = "/usr/local/bin/audiveris"
 
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
