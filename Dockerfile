@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     imagemagick \
     tesseract-ocr \
     python3 \
+    python3-venv \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
@@ -22,27 +23,34 @@ RUN git clone https://github.com/Audiveris/audiveris.git .
 RUN ./gradlew installDist --no-daemon
 
 # -----------------------------
-# 3. Instalar API (FastAPI)
+# 3. Criar ambiente virtual Python
 # -----------------------------
 WORKDIR /app
 
+RUN python3 -m venv /app/venv
+
+ENV PATH="/app/venv/bin:$PATH"
+
+# -----------------------------
+# 4. Instalar API (FastAPI)
+# -----------------------------
 COPY requirements.txt .
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY api.py .
 
 # -----------------------------
-# 4. Diretório de dados
+# 5. Diretório de dados
 # -----------------------------
 WORKDIR /data
 
 # -----------------------------
-# 5. Expor porta da API
+# 6. Expor porta da API
 # -----------------------------
 EXPOSE 8000
 
 # -----------------------------
-# 6. Subir a API automaticamente
+# 7. Subir a API automaticamente
 # -----------------------------
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
