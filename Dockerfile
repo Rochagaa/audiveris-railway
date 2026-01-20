@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /audiveris
 
 # Baixar Audiveris oficial via Maven Central (ESTÁVEL)
-RUN wget https://repo1.maven.org/maven2/org/audiveris/audiveris/5.3.1/audiveris-5.3.1.jar
+RUN wget https://repo1.maven.org/maven2/org/audiveris/audiveris-console/5.3.1/audiveris-console-5.3.1.jar
 
 # Script de inicialização
 COPY start.sh /start.sh
