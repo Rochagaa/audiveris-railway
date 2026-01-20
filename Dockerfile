@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /audiveris
 
 # Baixar Audiveris
-RUN wget https://github.com/Audiveris/audiveris/releases/download/5.4.3/Audiveris-5.4.3.zip \
-    && unzip Audiveris-5.4.3.zip \
-    && rm Audiveris-5.4.3.zip
+RUN wget https://github.com/Audiveris/audiveris/releases/download/5.4.3/Audiveris-5.4.3-bin.zip \
+    && unzip Audiveris-5.4.3-bin.zip \
+    && rm Audiveris-5.4.3-bin.zip
 
 # Copiar script de inicialização
 COPY start.sh /start.sh
