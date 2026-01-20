@@ -20,40 +20,37 @@ WORKDIR /audiveris
 
 RUN git clone https://github.com/Audiveris/audiveris.git .
 
-RUN ./gradlew installDist --no-daemon
-
-# Criar link fixo para o Audiveris
-RUN find /audiveris -type f -perm /111 -name audiveris | head -n 1 > /tmp/audiveris_path && \
-    ln -s "$(cat /tmp/audiveris_path)" /usr/local/bin/audiveris
+# IMPORTANTE: garantir build do módulo app
+RUN ./gradlew :app:installDist --no-daemon
 
 # -----------------------------
-# 3. Criar ambiente virtual Python
+# 3. Criar launcher fixo
+# -----------------------------
+RUN chmod +x /audiveris/app/build/install/app/bin/app && \
+    ln -s /audiveris/app/build/install/app/bin/app /usr/local/bin/audiveris
+
+# -----------------------------
+# 4. Criar ambiente Python
 # -----------------------------
 WORKDIR /app
 
 RUN python3 -m venv /app/venv
-
 ENV PATH="/app/venv/bin:$PATH"
 
-# -----------------------------
-# 4. Instalar API (FastAPI)
-# -----------------------------
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY api.py .
 
 # -----------------------------
+# 5. Diretório de dados
+# -----------------------------
+WORKDIR /data
 
-# -----------------------------
-# 5. Expor porta da API
-# -----------------------------
 EXPOSE 8000
 
 # -----------------------------
-# 6. Subir a API automaticamente
+# 6. Subir API
 # -----------------------------
 WORKDIR /app
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
-
